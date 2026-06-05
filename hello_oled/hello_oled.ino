@@ -11,11 +11,26 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 void setup() 
 {
-  // put your setup code here, to run once:
-
+  Serial.begin(115200);
+  if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS))
+  {
+    Serial.println(F("SSD1306 allocation failed"));
+    for(;;); //Loop forever, don proceed it
+  }
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(15,5);
+  display.println("LAT: 3.1390");
+  display.setCursor(15,20);
+  display.println("LON: 101.6869");
+  display.setCursor(15,35);
+  display.println("STATUS: MOCK");
+  display.setCursor(15,50);
+  display.println(">> TRACKER ON");
+  display.display();
 }
 
-void loop() {
-  // put your main code here, to run repeatedly:
-
+void loop() 
+{
 }

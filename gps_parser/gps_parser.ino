@@ -1,8 +1,13 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include <HardwareSerial.h>
-#include <cstring>
+
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+#define OLED_RESET -1
+#define SCREEN_ADDRESS 0x3C
+
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 HardwareSerial gpsSerial(1);
 char gLatitutde[12] = "";
@@ -13,79 +18,23 @@ char gStatus = 'V';
 char gpsBuffer[100];
 int buffIndex = 0;
 
-void setup()
+void setup() 
 {
   Serial.begin(9600);
-  gpsSerial.begin(9600);
+  gpsSerial.begin(9600, SERIAL_8N1, 20, 21);
+  if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS))
+  {
+    Serial.println("SSD1306 failed");
+    for(;;);
+  }
+  display.clearDisplay();
+  display.display();
   char testline[] = "$GPRMC,065733.00,A,0144.1500,N,10354.0200,E,0.0,0.0,080626,,,A*54";
-  parseGPRMC(tesline);
+  parseGPRMC(testline);
   updateOLED();
+}
 }
 
 void loop() 
 {
-  while (gpsSerial.available() > 0)
-  {
-    char c = gpsSerial.read();
-    if (c == '\n')
-    {
-      gpsBuffer[buffIndex] = '\0';
-      if (strncmp(gpsBuffer, "$GPRMC", 6) == 0)
-      {
-        parseGPRMC(gpsBuffer);
-        updateOLED();
-      }
-      buffIndex = 0;
-    }
-    else if (buffIndex < 99)
-    {
-      gpsBuffer[buffIndex++] = c;
-    }
-  }
-}
-
-void parseGPRMC(char line[])
-{
-  char copy[100];
-  strcpy(copy, line);
-  int fieldNum = 0;
-  char *token = strtok(copy, ",");
-
-  while (token != NULL)
-  {
-    if (fieldNum == 2)
-      gStatus = token[0];
-    if (fieldNum == 3)
-      strcpy(gLatitude, token);
-    if (fieldNum == 4)
-      gNS = token[0];
-    if (fieldNum == 5)
-      strcpy(gLongitude, token);
-    if (fieldNum == 6)
-      gEW = token[0];
-    fieldNum++;
-    token = strtok(NULL, ",");
-  }
-}
-
-void updateOLED()
-{
-  display.clearDisplay();
-  if (gStatus == 'A')
-  {
-    display.setCursor(15,20);
-    display.print("LAT: ");
-    display.println(gLatitude);
-    display.setCursor(15,35);
-    display.print("LON: ");
-    display.println(gLongitude);
-    display.setCursor(15,50);
-    display.println("FIX: YES");
-  }
-  else
-  {
-    display.setCursor(15, 20);
-    display.println("FIX: NO");
-  }
-  display.display();
 }

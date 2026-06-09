@@ -31,9 +31,14 @@ void setup()
   display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
   display.display();
+
+  /* This part for hardcode and testing only
   char testline[] = "$GPRMC,065733.00,A,0144.1500,N,10354.0200,E,0.0,0.0,080626,,,A*54";
   parseGPRMC(testline);
   updateOLED();
+  */
+
+  Serial.println("Waiting for GPS...");
 }
 
 void loop() 
@@ -41,6 +46,7 @@ void loop()
   while (gpsSerial.available() > 0)
   {
     char c = gpsSerial.read();
+    Serial.print(c);
     if (c == '\n')
     {
       gpsBuffer[buffIndex] = '\0';

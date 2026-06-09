@@ -27,18 +27,18 @@ void updateOLED()
   display.clearDisplay();
   if (gStatus == 'A')
   {
-    display.setCursor(15,20);
+    display.setCursor(15,15);
     display.print("LAT: ");
     display.println(gLatitude);
-    display.setCursor(15,35);
+    display.setCursor(15,30);
     display.print("LON: ");
     display.println(gLongitude);
-    display.setCursor(15,50);
+    display.setCursor(15,45);
     display.println("FIX: YES");
   }
   else
   {
-    display.setCursor(15, 20);
+    display.setCursor(15, 30);
     display.println("FIX: NO");
   }
   display.display();

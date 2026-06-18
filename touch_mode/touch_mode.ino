@@ -1,5 +1,5 @@
 #include <Wire.h>
-#include <Adafruit_GFS.h>
+#include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
 #define SCREEN_WIDTH 128
@@ -7,19 +7,24 @@
 #define OLED_RESET -1
 #define SCREEN_ADDRESS 0x3C
 
-Adafruit_SSD1306 displat(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
-char currentState = "NORMAL";
+char currentState[] = "NORMAL";
 int touchStartTime = 0;
 int touchDebounceTime = 0;
 bool touchHeld = false;
 
 const byte touchPin = 4;
 
+void toggleISR()
+{
+  bool touchFlag = true;
+}
+
 void setup() 
 {
   pinMode(touchPin, INPUT);
-  attachInterrupt(digitalPinToInterrupt(touchPin), toggleLedISR, FALLING);
+  attachInterrupt(digitalPinToInterrupt(touchPin), toggleISR, FALLING);
   Serial.begin(115200);
   if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS))
   {
@@ -46,8 +51,5 @@ void loop()
   }
 }
 
-void isr()
-{
-  bool touchFlag = true;
-}
+
 

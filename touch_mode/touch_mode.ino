@@ -10,15 +10,38 @@
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 char currentState[] = "NORMAL";
-int touchStartTime = 0;
-int touchDebounceTime = 0;
+unsigned long touchStartTime = 0;
+unsigned long touchDebounceTime = 0;
 bool touchHeld = false;
-
+bool touchFlag = false;
 const byte touchPin = 4;
 
-void toggleISR()
+void IRAM_ATTR toggleISR()
 {
-  bool touchFlag = true;
+  touchFlag = true;
+}
+
+void updateOLED()
+{
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  if (strcmp(currentState, "NORMAL") == 0)
+  {
+    display.setCursor(15, 25);
+    display.println("NORMAL MODE");
+  }
+  else if (strcmp(currentState, "PANIC") == 0)
+  {
+    display.setCursor(15, 20);
+    display.println("!! PANIC MODE !!");
+  }
+  else if (strcmp(currentState, "RESET") == 0)
+  {
+    display.setCursor(15, 25);
+    display.println("RESET OK");
+  }
+  display.display();
 }
 
 void setup() 
@@ -31,23 +54,54 @@ void setup()
     Serial.println(F("SSD1306 allocation failed"));
     for(;;); //Loop forever, don proceed it
   }
+  display.clearDisplay();
+  display.display();
 }
 
-void loop() 
+void loop()
 {
-  if (isr == true)
+  int touchState = digitalRead(touchPin);
+  // Checking 3 second Hold for RESET
+  if (touchState == HIGH)
   {
-    if (touchDebounceTime > 200)
+    // If start touch...
+    if (!touchHeld)
     {
-      
+      touchHeld = true;
+      touchStartTime = millis();
+    }
+    else if (millis() - touchStartTime > 3000)
+    {
+      strcpy(currentState, "RESET");
+      updateOLED();
+      delay(1000);
+      strcpy(currentState, "NORMAL");
+      updateOLED();
+      touchHeld = false;
     }
   }
-  if (digitalRead(touchPin, HIGH))
+  else
   {
-    if > 3
+    // Finger release, reset held flag
+    touchHeld = false;
+  }
+  if (touchFlag == true)
+  {
+    unsigned long timeNow = millis();
+    if (timeNow - touchDebounceTime > 200)
     {
-      current_state = "RESET";
+      touchDebounceTime = timeNow;
+      if (strcmp(currentState, "NORMAL") == 0)
+      {
+        strcpy(currentState, "PANIC");
+      }
+      else if (strcmp(currentState, "PANIC") == 0)
+      {
+        strcpy(currentState, "NORMAL");
+      }
+      updateOLED();
     }
+    touchFlag = false;
   }
 }
 

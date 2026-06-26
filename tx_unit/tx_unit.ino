@@ -29,7 +29,7 @@ unsigned long touchStartTime = 0;
 unsigned long touchDebounceTime = 0;
 bool touchHeld = false;
 bool touchFlag = false;
-const byte touchPin = 0;
+const byte touchPin = 10;
 
 // --- nRF24 ---
 struct GPSPacket
@@ -146,9 +146,9 @@ void loop()
   bool result = radio.write(&packet, sizeof(packet));
   if (result)
   {
-    Serial.println("[TX] Sent -> LAT:");
-    Serial.println(packet.lat);
-    Serial.println("LON:");
+    Serial.print("[TX] Sent -> LAT:");
+    Serial.print(packet.lat);
+    Serial.print("LON:");
     Serial.println(packet.lon);
   }
   else

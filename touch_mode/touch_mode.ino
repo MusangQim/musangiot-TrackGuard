@@ -14,7 +14,7 @@ unsigned long touchStartTime = 0;
 unsigned long touchDebounceTime = 0;
 bool touchHeld = false;
 bool touchFlag = false;
-const byte touchPin = 4;
+const byte touchPin = 10;
 
 void IRAM_ATTR toggleISR()
 {

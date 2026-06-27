@@ -22,7 +22,6 @@ char gStatus = 'V';
 char gpsBuffer[100];
 int buffIndex = 0;
 
-
 // --- Touch ---
 char currentState[] = "NORMAL";
 unsigned long touchStartTime = 0;
